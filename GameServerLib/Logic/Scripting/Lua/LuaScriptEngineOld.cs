@@ -6,14 +6,14 @@ using System.Reflection;
 
 namespace LeagueSandbox.GameServer.Logic.Scripting.Lua
 {
-    public class LuaScriptEngine : IScriptEngine
+    public class LuaScriptEngineOld : IScriptEngineOld
     {
         private Logger _logger = Program.ResolveDependency<Logger>();
 
         private bool _isLoaded;
         private NLua.Lua _lua;
 
-        public LuaScriptEngine()
+        public LuaScriptEngineOld()
         {
             _lua = new NLua.Lua();
         }

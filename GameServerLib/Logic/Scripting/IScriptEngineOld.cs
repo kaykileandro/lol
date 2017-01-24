@@ -2,7 +2,7 @@
 
 namespace LeagueSandbox.GameServer.Logic.Scripting
 {
-    public interface IScriptEngine
+    public interface IScriptEngineOld
     {
         bool IsLoaded();
         void Load(string location);

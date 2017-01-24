@@ -28,7 +28,7 @@ namespace LeagueSandbox.GameServer
             Bind<NetworkIdManager>().To<NetworkIdManager>().InSingletonScope();
 
             // Other bindings
-            Bind<IScriptEngine>().To<LuaScriptEngine>();
+            //Bind<IScriptEngine>().To<LuaScriptEngine>();
         }
     }
 }

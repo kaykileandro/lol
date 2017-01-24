@@ -7,6 +7,7 @@ using LeagueSandbox.GameServer.Logic.API;
 using LeagueSandbox.GameServer.Logic.Scripting;
 using LeagueSandbox.GameServer.Logic.Scripting.Lua;
 using Newtonsoft.Json.Linq;
+using LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine;
 
 namespace LeagueSandbox.GameServer.Logic.GameObjects
 {
@@ -105,7 +106,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         public bool NoCooldown { get; }
         public bool NoManacost { get; }
 
-        private IScriptEngine _scriptEngine;
+        private CSharpScriptEngine _scriptEngine = CSharpScriptEngine.getInstance();
         private Logger _logger = Program.ResolveDependency<Logger>();
         private Game _game = Program.ResolveDependency<Game>();
         private RAFManager _rafManager = Program.ResolveDependency<RAFManager>();
@@ -125,8 +126,8 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             NoCooldown = !_game.Config.CooldownsEnabled;
             NoManacost = !_game.Config.ManaCostsEnabled;
 
-            _scriptEngine = new LuaScriptEngine();
-            LoadLua(_scriptEngine);
+            _scriptEngine = CSharpScriptEngine.getInstance();// new LuaScriptEngine();
+            //LoadLua(_scriptEngine);
 
             JObject data;
 
@@ -233,7 +234,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 0.5f
             );
 
-            ReloadLua();
+            //ReloadLua();
         }
 
         public void LoadExtraSpells(Champion champ)
@@ -271,16 +272,17 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             Target = u;
             this.futureProjNetId = futureProjNetId;
             this.spellNetId = spellNetId;
-            _scriptEngine.SetGlobalVariable("castTarget", Target);
-            _scriptEngine.SetGlobalVariable("spellLevel", Level);
-            _scriptEngine.SetGlobalVariable("totalCooldown", getCooldown());
+            //_scriptEngine.SetGlobalVariable("castTarget", Target);
+            //_scriptEngine.SetGlobalVariable("spellLevel", Level);
+            //_scriptEngine.SetGlobalVariable("totalCooldown", getCooldown());
 
             if (_targetType == 1 && Target != null && Target.GetDistanceTo(Owner) > _castRange[Level - 1])
             {
                 return false;
             }
 
-            RunCastLua();
+
+            RunCast();
 
             if (CastTime > 0 && (Flags & (int)SpellFlag.SPELL_FLAG_InstantCast) == 0)
             {
@@ -295,11 +297,16 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             return true;
         }
 
-        private void RunCastLua()
+        
+        private void RunCast()
         {
-            if (!_scriptEngine.IsLoaded())
-                return;
+            Action<Champion,Spell,Unit> onStartCasting =
+                _scriptEngine.getStaticMethod<Action<Champion, Spell,Unit>>(GetSpellScriptClass(), GetSpellScriptName(), "onStartCasting");
+            onStartCasting(Owner, this, Target);
+            //if (!_scriptEngine.IsLoaded())
+            //    return;
 
+            /*
             try
             {
                 _scriptEngine.SetGlobalVariable("castTarget", Target);
@@ -313,6 +320,30 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             {
                 _logger.LogCoreError("LUA ERROR : " + e);
             }
+            */
+        }
+        
+        public string GetSpellScriptClass()
+        {
+            if (Slot > 3)
+            {
+                return "Global";
+            }
+            else
+            {
+                return Owner.Model;
+            }
+        }
+        public string GetSpellScriptName()
+        {
+            if (Slot > 3)
+            {
+                return _spellName;
+            }
+            else
+            {
+                return getStringForSlot();
+            }
         }
 
         /// <summary>
@@ -320,7 +351,12 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         /// </summary>
         public virtual void finishCasting()
         {
+            //Champion owner, Spell spell, Unit target
+            Action<Champion, Spell, Unit> onFinishCasting =
+                _scriptEngine.getStaticMethod<Action<Champion, Spell, Unit>>(GetSpellScriptClass(), GetSpellScriptName(), "onFinishCasting");
+            onFinishCasting(Owner, this, Target);
             //_logger.LogCoreInfo("Spell from slot " + Slot + " has channeltime: " + getChannelDuration());
+            /*
             try
             {
                 _scriptEngine.Execute("onFinishCasting()");
@@ -329,7 +365,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             {
                 _logger.LogCoreError("LUA ERROR : " + e.Message);
             }
-
+            */
             if(getChannelDuration() == 0)
             {
                 state = SpellState.STATE_COOLDOWN;
@@ -358,6 +394,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
 
         private void RunChannelLua()
         {
+            /*
             if (!_scriptEngine.IsLoaded())
                 return;
 
@@ -370,6 +407,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             {
                 _logger.LogCoreError("LUA ERROR : " + e);
             }
+            */
         }
 
         /// <summary>
@@ -378,6 +416,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         public virtual void finishChanneling()
         {
             //_logger.LogCoreInfo("Channeled Spell on " + Slot);
+            /*
             try
             {
                 _scriptEngine.Execute("onFinishChanneling()");
@@ -386,6 +425,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             {
                 _logger.LogCoreError("LUA ERROR : " + e.Message);
             }
+            */
 
             state = SpellState.STATE_COOLDOWN;
 
@@ -436,6 +476,10 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                     break;
             }
 
+            Action<double> onUpdate =
+                _scriptEngine.getStaticMethod<Action<double>>(GetSpellScriptClass(), GetSpellScriptName(), "onUpdate");
+            onUpdate(diff);
+            /*
             if (_scriptEngine.IsLoaded())
             {
                 try
@@ -449,7 +493,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 {
                     _logger.LogCoreError("LUA ERROR : " + e);
                 }
-            }
+            }*/
         }
 
         /// <summary>
@@ -461,7 +505,11 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             {
                 ApiFunctionManager.AddParticleTarget(Owner, hitEffectName, u);
             }
-
+            
+            Action<Champion, Unit, Spell, Projectile> applyEffects =
+                _scriptEngine.getStaticMethod<Action<Champion, Unit, Spell, Projectile>>(GetSpellScriptClass(), GetSpellScriptName(), "applyEffects");
+            applyEffects(Owner, u, this, p);
+            /*
             _scriptEngine.SetGlobalVariable("u", u);
             _scriptEngine.Execute(@"
                 function getTarget()
@@ -512,6 +560,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             {
                 _logger.LogCoreError("LUA ERROR : " + e.Message);
             }
+            */
         }
 
         public float getEffectValue(int effectNo)
@@ -681,7 +730,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
 
             _game.Map.AddObject(p);
         }
-
+        /*
         public void LoadLua(IScriptEngine scriptEngine)
         {
             var config = _game.Config;
@@ -738,29 +787,29 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             scriptEngine.RegisterFunction("addLaser", this, typeof(Spell).GetMethod("AddLaser", new[] { typeof(float), typeof(float), typeof(bool) }));
             scriptEngine.RegisterFunction("teleport", this, typeof(Spell).GetMethod("Teleport", new[] { typeof(Unit), typeof(float), typeof(float) }));
 
-            /*scriptEngine.RegisterFunction("addMovementSpeedBuff", this, typeof(Spell).GetMethod("addMovementSpeedBuff", new Type[] { typeof(Unit), typeof(float), typeof(float) }));
+            //scriptEngine.RegisterFunction("addMovementSpeedBuff", this, typeof(Spell).GetMethod("addMovementSpeedBuff", new Type[] { typeof(Unit), typeof(float), typeof(float) }));
 
-            public void addMovementSpeedBuff(Unit u, float amount, float duration)
-            {
-                Buff b = new Buff(duration);
-                b.setMovementSpeedPercentModifier(amount);
-                u.AddBuff(b);
-                u.GetStats().addMovementSpeedPercentageModifier(b.getMovementSpeedPercentModifier());
-            }*/
+            //public void addMovementSpeedBuff(Unit u, float amount, float duration)
+            //{
+            //    Buff b = new Buff(duration);
+            //    b.setMovementSpeedPercentModifier(amount);
+            //    u.AddBuff(b);
+            //    u.GetStats().addMovementSpeedPercentageModifier(b.getMovementSpeedPercentModifier());
+            //}
 
             scriptEngine.Load(scriptloc); //todo: abstract class that loads a lua file for any lua
-        }
+        }*/
 
         public void Teleport(Unit target, float x, float y)
         {
             _game.PacketNotifier.NotifyTeleport(target, x, y);
         }
-
+        /*
         public void ReloadLua()
         {
             LoadLua(_scriptEngine);
         }
-
+        */
         /**
          * TODO : Add in CDR % from champion's stat
          */

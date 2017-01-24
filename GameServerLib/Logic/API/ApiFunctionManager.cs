@@ -205,7 +205,7 @@ namespace LeagueSandbox.GameServer.Logic.API
         {
             return unit is Monster;
         }
-
+        /*
         public static void AddBaseFunctionToLuaScript(IScriptEngine scriptEngine)
         {
             if (scriptEngine == null)
@@ -231,5 +231,6 @@ namespace LeagueSandbox.GameServer.Logic.API
             scriptEngine.RegisterFunction("unitIsPlaceable", null, typeof(ApiFunctionManager).GetMethod("UnitIsPlaceable", new Type[] { typeof(GameObject) }));
             scriptEngine.RegisterFunction("unitIsMonster", null, typeof(ApiFunctionManager).GetMethod("UnitIsMonster", new Type[] { typeof(GameObject) }));
         }
+        */
     }
 }

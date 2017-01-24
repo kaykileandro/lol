@@ -38,12 +38,36 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CSScriptLibrary, Version=3.19.0.0, Culture=neutral, PublicKeyToken=70fcc3d18c749033, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\CSScriptLibrary.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ENetCS, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ENetSharpLeague.1.1.0\lib\net461\ENetCS.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="KeraLua, Version=1.3.2.0, Culture=neutral, PublicKeyToken=04d04586786c6f34, processorArchitecture=MSIL">
       <HintPath>..\packages\NLua.1.3.2.1\lib\net45\KeraLua.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp.Scripting, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\Microsoft.CodeAnalysis.CSharp.Scripting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.Scripting, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\Microsoft.CodeAnalysis.Scripting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.CSharp, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\Mono.CSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -60,11 +84,24 @@
     </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.FileSystem, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\System.IO.FileSystem.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.3.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\CS-Script.bin.3.19.0.0\lib\net46\System.Reflection.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows" />
@@ -163,7 +200,9 @@
     <Compile Include="Logic\Packets\PacketHandlers\Handlers\HandleUnpauseReq.cs" />
     <Compile Include="Logic\Players\PlayerManager.cs" />
     <Compile Include="Logic\PreciseTimer.cs" />
-    <Compile Include="Logic\Scripting\Lua\LuaScriptEngine.cs" />
+    <Compile Include="Logic\Scripting\CSharp\Benchmark.cs" />
+    <Compile Include="Logic\Scripting\CSharp\CSharpScriptEngine.cs" />
+    <Compile Include="Logic\Scripting\Lua\LuaScriptEngineOld.cs" />
     <Compile Include="Logic\Maps\SummonersRift.cs" />
     <Compile Include="Logic\Packets\PacketHandlers\Handlers\HandleAutoAttackOption.cs" />
     <Compile Include="Logic\Packets\PacketHandlers\Handlers\HandleUseObject.cs" />
@@ -199,9 +238,12 @@
     <Compile Include="Logic\Pair.cs" />
     <Compile Include="Logic\RAF\AIMesh.cs" />
     <Compile Include="Logic\RAF\RAFManager.cs" />
-    <Compile Include="Logic\Scripting\IScriptEngine.cs" />
+    <Compile Include="Logic\Scripting\IScriptEngineOld.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripting.evaluator.cs" />
+    <Compile Include="Scripting.Extensions.cs" />
+    <Compile Include="Scripting.native.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerContext.cs" />
   </ItemGroup>

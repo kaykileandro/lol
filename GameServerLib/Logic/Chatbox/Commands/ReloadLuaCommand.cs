@@ -10,6 +10,7 @@ namespace LeagueSandbox.GameServer.Logic.Chatbox.Commands
 
         public override void Execute(Peer peer, bool hasReceivedArguments, string arguments = "")
         {
+            /*
             PlayerManager _playerManager = Program.ResolveDependency<PlayerManager>();
             var champ = _playerManager.GetPeerInfo(peer).Champion;
             foreach (var spell in champ.Spells.Values)
@@ -18,6 +19,7 @@ namespace LeagueSandbox.GameServer.Logic.Chatbox.Commands
             }
             champ.LoadLua();
             _owner.SendDebugMsgFormatted(DebugMsgType.INFO, "Successfully reloaded luas for your champion!");
+            */
         }
     }
 }

@@ -118,13 +118,13 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 AutoAttackProjectileSpeed = _rafManager.GetFloatValue(autoAttack, "SpellData", "MissileSpeed");
             }
 
-            LoadLua();
+            //LoadLua();
             foreach (var spell in Spells.Values)
             {
                 spell.LoadExtraSpells(this);
             }
         }
-
+        /*
         public override void LoadLua()
         {
             base.LoadLua();
@@ -139,7 +139,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 end");
             _scriptEngine.Load(scriptloc);
         }
-
+        */
         private string GetPlayerIndex()
         {
             return $"player{_playerId}";
@@ -244,6 +244,8 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             if (s.cast(x, y, target, futureProjNetId, spellNetId))
             {
                 stats.CurrentMana = stats.CurrentMana - s.getCost() * (1 - stats.getSpellCostReduction());
+                
+                /*
                 try
                 {
                     _scriptEngine.RunFunction("onSpellCast", x, y, slot, target);
@@ -252,6 +254,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 {
                     _logger.LogCoreError("LUA ERROR : " + e.Message);
                 }
+                */
                 return s;
             }
             return null;

@@ -10,6 +10,7 @@ using LeagueSandbox.GameServer.Logic.GameObjects;
 using LeagueSandbox.GameServer.Logic.Maps;
 using LeagueSandbox.GameServer.Logic.Packets;
 using LeagueSandbox.GameServer.Logic.Players;
+using LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -99,6 +100,12 @@ namespace LeagueSandbox.GameServer.Core.Logic
             };
             _pauseTimer.Elapsed += (sender, args) => PauseTimeLeft--;
             PauseTimeLeft = 30 * 60; // 30 minutes
+
+            _logger.LogCoreInfo("Loading C# Scripts");
+
+            CSharpScriptEngine scriptEngine = CSharpScriptEngine.getInstance();
+            scriptEngine.prepareCompiler();
+            scriptEngine.loadSubdirectoryScripts("Content/Data/LeagueSandbox-Default/");
 
             _logger.LogCoreInfo("Game is ready.");
         }
