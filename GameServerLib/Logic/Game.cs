@@ -105,7 +105,7 @@ namespace LeagueSandbox.GameServer.Core.Logic
 
             CSharpScriptEngine scriptEngine = CSharpScriptEngine.getInstance();
             scriptEngine.prepareCompiler();
-            scriptEngine.loadSubdirectoryScripts("Content/Data/LeagueSandbox-Default/");
+            scriptEngine.loadSubdirectoryScripts("Content/Data/"+config.GameConfig.GameMode+"/");
 
             _logger.LogCoreInfo("Game is ready.");
         }
