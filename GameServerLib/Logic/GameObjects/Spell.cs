@@ -273,7 +273,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
 
 
-            RunCast();
+            RunCastScripts();
 
             if (CastTime > 0 && (Flags & (int)SpellFlag.SPELL_FLAG_InstantCast) == 0)
             {
@@ -289,7 +289,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         }
 
         
-        private void RunCast()
+        private void RunCastScripts()
         {
             Action<Champion,Spell,Unit> onStartCasting =
                 _scriptEngine.getStaticMethod<Action<Champion, Spell,Unit>>(GetSpellScriptClass(), GetSpellScriptName(), "onStartCasting");
@@ -350,11 +350,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         {
             state = SpellState.STATE_CHANNELING;
             _currentChannelDuration = getChannelDuration();
-            RunChannelLua();
-        }
-
-        private void RunChannelLua()
-        {
         }
 
         /// <summary>
