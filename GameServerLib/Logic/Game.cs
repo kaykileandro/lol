@@ -103,7 +103,7 @@ namespace LeagueSandbox.GameServer.Core.Logic
 
             _logger.LogCoreInfo("Loading C# Scripts");
 
-            CSharpScriptEngine scriptEngine = CSharpScriptEngine.getInstance();
+            CSharpScriptEngine scriptEngine = Program.ResolveDependency<CSharpScriptEngine>();
             scriptEngine.prepareCompiler();
             scriptEngine.loadSubdirectoryScripts("Content/Data/"+config.GameConfig.GameMode+"/");
 

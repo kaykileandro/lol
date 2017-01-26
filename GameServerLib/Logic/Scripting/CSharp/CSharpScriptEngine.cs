@@ -5,21 +5,14 @@ using System.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using LeagueSandbox.GameServer.Core.Logic;
-using System.Numerics;
-using LeagueSandbox.GameServer.Logic.Scripting.Benchmark;
 
 namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
 {
     public class CSharpScriptEngine
     {
-        private static CSharpScriptEngine _myInstance = new CSharpScriptEngine();
-        static public CSharpScriptEngine getInstance() { return _myInstance; }
-
-
         Assembly scriptAssembly = null;
         public CSharpScriptEngine()
         {
@@ -27,7 +20,6 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
         //Compile example assembly to load all the compiler resources, takes 1700 milliseconds first time
         public void prepareCompiler()
         {
-            //Benchmark.StartTiming("Prepare Compiler");
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(@"
             using System;
 
@@ -62,7 +54,6 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
                 EmitResult result = compilation.Emit(ms);//, pdb);
                 //}
             }
-            //Benchmark.EndTiming("Prepare Compiler");
         }
         public void loadSubdirectoryScripts(String folder)
         {
@@ -72,8 +63,6 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
         //Takes about 300 milliseconds for a single script
         public void load(List<string> scriptLocations)
         {
-
-            //Benchmark.StartTiming("Script Loading");
             List<SyntaxTree> treeList = new List<SyntaxTree>();
             Parallel.For(0, scriptLocations.Count, (i)=> {
                 Console.WriteLine("Loading script: " + scriptLocations[i]);
@@ -87,25 +76,16 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
                     }
                 }
             });
-            //Benchmark.EndTiming("Script Loading");
             
             string assemblyName = Path.GetRandomFileName();
-
-            //Benchmark.StartTiming("Reference Loading");
+            
             List<MetadataReference> references = new List<MetadataReference>();
             foreach (Assembly a in System.AppDomain.CurrentDomain.GetAssemblies())
             {
-                try
-                {
-                    references.Add(MetadataReference.CreateFromFile(a.Location));
-                } catch(Exception e)
-                {
-                    Console.WriteLine("Could not add assembly: " + a.FullName);
-                }
+                if (!a.IsDynamic) references.Add(MetadataReference.CreateFromFile(a.Location));
             }
             //Now add game reference
             references.Add(MetadataReference.CreateFromFile(typeof(Game).Assembly.Location));
-            //Benchmark.EndTiming("Reference Loading");
 
             var op = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 .WithOptimizationLevel(OptimizationLevel.Release).WithConcurrentBuild(true);
@@ -119,9 +99,7 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
             {
                 //using (var pdb = new MemoryStream())
                 {
-                    //Benchmark.StartTiming("Compiled class");
                     EmitResult result = compilation.Emit(ms);//, pdb);
-                    //Benchmark.EndTiming("Compiled class");
                     
                     if (!result.Success)
                     {
@@ -132,28 +110,14 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
                         foreach (Diagnostic diagnostic in failures)
                         {
                             Location loc = diagnostic.Location;
-                            //loc.SourceTree.ToString
-                            //loc.ToString
                             Console.Error.WriteLine("{0}: {1} with location: {2}", diagnostic.Id, diagnostic.GetMessage(), loc.SourceTree.ToString());
                         }
                     }
                     else
                     {
                         ms.Seek(0, SeekOrigin.Begin);
-
-                        //Benchmark.StartTiming("Loaded assembly");
+                        
                         scriptAssembly = Assembly.Load(ms.ToArray());
-                        //Benchmark.EndTiming("Loaded assembly");
-
-                        /*
-                        Type type = assembly.GetType("RoslynCompileSample.Writer");
-                        object obj = Activator.CreateInstance(type);
-                        type.InvokeMember("Write",
-                            BindingFlags.Default | BindingFlags.InvokeMethod,
-                            null,
-                            obj,
-                            new object[] { "Hello World" });
-                            */
                     }
                 }
             }
@@ -174,10 +138,7 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
         {
             if (scriptAssembly == null) return default(T);
 
-
-            //Benchmark.StartTiming("Script Assembly Type Lookup");
             Type classType = scriptAssembly.GetType(scriptNamespace + "." + scriptClass);
-            //Benchmark.EndTiming("Script Assembly Type Lookup");
 
             return (T)Activator.CreateInstance(classType);
         }
@@ -197,30 +158,5 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharpScriptEngine
             Type typeParameterType = typeof(T);
             return (T)((object)Delegate.CreateDelegate(typeParameterType, obj, desiredFunction));
         }
-        /*
-        public void runFunction(String scriptNamespace, String scriptClass, String scriptFunction, params object[] args)
-        {
-            if (scriptAssembly == null) return;
-            
-            Benchmark.Log("Script type: " + scriptAssembly.GetType(scriptNamespace + "." + scriptClass).FullName);
-            foreach (MethodInfo m in scriptAssembly.GetType(scriptNamespace + "." + scriptClass).GetMethods())
-            {
-                Benchmark.Log("Method: " + m.Name);
-            }
-            Benchmark.Log("Script method: " + scriptAssembly.GetType(scriptNamespace + "." + scriptClass).GetMethod(scriptFunction, BindingFlags.Public | BindingFlags.Static).ToString());
-
-            Type classType = scriptAssembly.GetType(scriptNamespace + "." + scriptClass);
-            MethodInfo desiredFunction = classType.GetMethod(scriptFunction, BindingFlags.Public | BindingFlags.Static);
-            //desiredFunction.Invoke(null, args);
-
-            Action<double> functionDelegate = (Action<double>)Delegate.CreateDelegate
-                (typeof(Action<double>), desiredFunction);
-
-            Benchmark.StartTiming("Running Function");
-            functionDelegate();
-            Benchmark.EndTiming("Running Function");
-        }
-        */
-        //void RunFunction(string function, params object[] args);
     }
 }

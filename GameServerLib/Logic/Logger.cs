@@ -22,7 +22,7 @@ namespace LeagueSandbox.GameServer.Core.Logic
             AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
-
+        
         public void CurrentDomain_FirstChanceException(object sender, FirstChanceExceptionEventArgs e)
         {
             if (e.Exception is InvalidCastException || e.Exception is System.Collections.Generic.KeyNotFoundException)

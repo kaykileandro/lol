@@ -3,10 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using LeagueSandbox.GameServer.Core.Logic.RAF;
-using NLua.Exceptions;
-using LeagueSandbox.GameServer.Logic.API;
-using LeagueSandbox.GameServer.Logic.Scripting;
-using LeagueSandbox.GameServer.Logic.Scripting.Lua;
 using LeagueSandbox.GameServer.Logic.Items;
 using LeagueSandbox.GameServer.Logic.Content;
 using LeagueSandbox.GameServer.Logic.Players;
@@ -106,7 +102,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         }
 
         private bool _isNextAutoCrit;
-        protected CSharpScriptEngine _scriptEngine = CSharpScriptEngine.getInstance(); //new LuaScriptEngine();
+        protected CSharpScriptEngine _scriptEngine = Program.ResolveDependency<CSharpScriptEngine>();
         protected Logger _logger = Program.ResolveDependency<Logger>();
 
         public int KillDeathCounter { get; protected set; }
@@ -131,37 +127,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             this.stats = stats;
             this.Model = model;
         }
-        /*
-        public virtual void LoadLua()
-        {
-            _scriptEngine = new LuaScriptEngine();
-
-            _scriptEngine.Execute("package.path = 'LuaLib/?.lua;' .. package.path");
-            _scriptEngine.Execute(@"
-                function onAutoAttack(target)
-                end");
-            _scriptEngine.Execute(@"
-                function onUpdate(diff)
-                end");
-            _scriptEngine.Execute(@"
-                function onDealDamage(target, damage, type, source)
-                end");
-            _scriptEngine.Execute(@"
-                function onDie(killer)
-                end");
-            _scriptEngine.Execute(@"
-                function onDamageTaken(attacker, damage, type, source)
-                end");
-            _scriptEngine.Execute(@"
-                function onCollide(collider)
-                end");
-            _scriptEngine.Execute(@"
-                function onCollideWithTerrain()
-                end");
-
-            ApiFunctionManager.AddBaseFunctionToLuaScript(_scriptEngine);
-        }
-        */
         public Stats GetStats()
         {
             return stats;
@@ -172,20 +137,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             _timerUpdate += diff;
             if (_timerUpdate >= UPDATE_TIME)
             {
-
-                /*
-                if (_scriptEngine.IsLoaded())
-                {
-                    try
-                    {
-                        _scriptEngine.RunFunction("onUpdate", _timerUpdate);
-                    }
-                    catch (LuaScriptException e)
-                    {
-                        _logger.LogCoreError("LUA ERROR : " + e.Message);
-                    }
-                }
-                */
                 _timerUpdate = 0;
             }
 
@@ -345,14 +296,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         public override void onCollision(GameObject collider)
         {
             base.onCollision(collider);
-            /*
-            if (!_scriptEngine.IsLoaded())
-            {
-                return;
-            }
-            */
-            //try
-            //{
                 if (collider == null)
                 {
                     //_scriptEngine.RunFunction("onCollideWithTerrain");
@@ -361,11 +304,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 {
                    // _scriptEngine.RunFunction("onCollide", collider);
                 }
-            //}
-            //catch (LuaException e)
-            //{
-            //    _logger.LogCoreError("LUA ERROR : " + e.Message);
-            //}
         }
 
         /// <summary>
@@ -382,19 +320,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             dealDamageTo(target, damage, DamageType.DAMAGE_TYPE_PHYSICAL,
                                              DamageSource.DAMAGE_SOURCE_ATTACK,
                                              _isNextAutoCrit);
-            /*
-            if (_scriptEngine.IsLoaded())
-            {
-                try
-                {
-                    _scriptEngine.RunFunction("onAutoAttack", target);
-                }
-                catch (LuaScriptException e)
-                {
-                    _logger.LogCoreError("LUA ERROR : " + e.Message);
-                }
-            }
-            */
         }
 
         public virtual void dealDamageTo(Unit target, float damage, DamageType type, DamageSource source, bool isCrit)
@@ -405,19 +330,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             {
                 text = DamageText.DAMAGE_TEXT_CRITICAL;
             }
-            /*
-            if (_scriptEngine.IsLoaded())
-            {
-                try
-                {
-                    _scriptEngine.RunFunction("onDealDamage", target, damage, type, source);
-                }
-                catch (LuaScriptException e)
-                {
-                    _logger.LogCoreError("ERROR LUA : " + e.Message);
-                }
-            }
-            */
             float defense = 0;
             float regain = 0;
             switch (type)
@@ -445,23 +357,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
 
             //Damage dealing. (based on leagueoflegends' wikia)
             damage = defense >= 0 ? (100 / (100 + defense)) * damage : (2 - (100 / (100 - defense))) * damage;
-            /*
-            if (target._scriptEngine.IsLoaded())
-            {
-                try
-                {
-                    target._scriptEngine.Execute(@"
-                        function modifyIncomingDamage(value)
-                            damage = value
-                        end");
-                    target._scriptEngine.RunFunction("onDamageTaken", this, damage, type, source);
-                }
-                catch (LuaScriptException e)
-                {
-                    _logger.LogCoreError("LUA ERROR : " + e);
-                }
-            }
-            */
             target.GetStats().CurrentHealth = Math.Max(0.0f, target.GetStats().CurrentHealth - damage);
             if (!target.IsDead && target.GetStats().CurrentHealth <= 0)
             {
@@ -481,19 +376,6 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
 
         public virtual void die(Unit killer)
         {
-            /*
-            if (_scriptEngine.IsLoaded())
-            {
-                try
-                {
-                    _scriptEngine.RunFunction("onDie", killer);
-                }
-                catch (LuaScriptException e)
-                {
-                    _logger.LogCoreError(string.Format("LUA ERROR : {0}", e.Message));
-                }
-            }
-            */
             setToRemove();
             _game.Map.StopTargeting(this);
 

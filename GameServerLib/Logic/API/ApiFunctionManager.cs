@@ -205,32 +205,5 @@ namespace LeagueSandbox.GameServer.Logic.API
         {
             return unit is Monster;
         }
-        /*
-        public static void AddBaseFunctionToLuaScript(IScriptEngine scriptEngine)
-        {
-            if (scriptEngine == null)
-                return;
-            scriptEngine.RegisterFunction("setChampionModel", null, typeof(ApiFunctionManager).GetMethod("SetChampionModel", new Type[] { typeof(Champion), typeof(string) }));
-            scriptEngine.RegisterFunction("teleportTo", null, typeof(ApiFunctionManager).GetMethod("TeleportTo", new Type[] { typeof(Unit), typeof(float), typeof(float) }));
-            scriptEngine.RegisterFunction("addParticle", null, typeof(ApiFunctionManager).GetMethod("AddParticle", new Type[] { typeof(Champion), typeof(string), typeof(float), typeof(float), typeof(float), typeof(string) }));
-            scriptEngine.RegisterFunction("addParticleTarget", null, typeof(ApiFunctionManager).GetMethod("AddParticleTarget", new Type[] { typeof(Champion), typeof(string), typeof(Target), typeof(float), typeof(string) }));
-            scriptEngine.RegisterFunction("addBuff", null, typeof(ApiFunctionManager).GetMethod("AddBuff", new Type[] { typeof(string), typeof(float), typeof(int), typeof(Unit), typeof(Unit) }));
-            scriptEngine.RegisterFunction("printChat", null, typeof(ApiFunctionManager).GetMethod("PrintChat", new Type[] { typeof(string) }));
-            scriptEngine.RegisterFunction("getUnitsInRange", null, typeof(ApiFunctionManager).GetMethod("GetUnitsInRange", new Type[] { typeof(Target), typeof(float), typeof(bool) }));
-            scriptEngine.RegisterFunction("getChampionsInRange", null, typeof(ApiFunctionManager).GetMethod("GetChampionsInRange", new Type[] { typeof(Target), typeof(float), typeof(bool) }));
-            scriptEngine.RegisterFunction("dashToLocation", null, typeof(ApiFunctionManager).GetMethod("DashToLocation", new Type[] { typeof(Unit), typeof(float), typeof(float), typeof(float), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(float), typeof(float) }));
-            scriptEngine.RegisterFunction("dashToUnit", null, typeof(ApiFunctionManager).GetMethod("DashToUnit", new Type[] { typeof(Unit), typeof(Target), typeof(float), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(float), typeof(float) }));
-            scriptEngine.RegisterFunction("getTeam", null, typeof(ApiFunctionManager).GetMethod("GetTeam", new Type[] { typeof(GameObject) }));
-            scriptEngine.RegisterFunction("isDead", null, typeof(ApiFunctionManager).GetMethod("IsDead", new Type[] { typeof(Unit) }));
-            scriptEngine.RegisterFunction("sendPacket", null, typeof(ApiFunctionManager).GetMethod("SendPacket", new Type[] { typeof(string) }));
-            scriptEngine.RegisterFunction("unitIsChampion", null, typeof(ApiFunctionManager).GetMethod("UnitIsChampion", new Type[] { typeof(GameObject) }));
-            scriptEngine.RegisterFunction("unitIsMinion", null, typeof(ApiFunctionManager).GetMethod("UnitIsMinion", new Type[] { typeof(GameObject) }));
-            scriptEngine.RegisterFunction("unitIsTurret", null, typeof(ApiFunctionManager).GetMethod("UnitIsTurret", new Type[] { typeof(GameObject) }));
-            scriptEngine.RegisterFunction("unitIsInhibitor", null, typeof(ApiFunctionManager).GetMethod("UnitIsInhibitor", new Type[] { typeof(GameObject) }));
-            scriptEngine.RegisterFunction("unitIsNexus", null, typeof(ApiFunctionManager).GetMethod("UnitIsNexus", new Type[] { typeof(GameObject) }));
-            scriptEngine.RegisterFunction("unitIsPlaceable", null, typeof(ApiFunctionManager).GetMethod("UnitIsPlaceable", new Type[] { typeof(GameObject) }));
-            scriptEngine.RegisterFunction("unitIsMonster", null, typeof(ApiFunctionManager).GetMethod("UnitIsMonster", new Type[] { typeof(GameObject) }));
-        }
-        */
     }
 }
